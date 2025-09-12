@@ -9,7 +9,7 @@ export const config = {
 export default async function handler(req) {
   try {
     // 1. Ask the GitHub API for the latest commit on your *data* repository.
-    const githubResponse = await fetch('https://api.github.com/repos/zantac/YouthScoresData/branches/main');
+    const githubResponse = await fetch('https://api.github.com/repos/zantac/FootballData/branches/main');
     
     if (!githubResponse.ok) {
       // If GitHub is down or the repo is private, throw an error.
