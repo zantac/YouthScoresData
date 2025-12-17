@@ -48,3 +48,18 @@ export default async function handler(req) {
     });
   }
 }
+
+
+export default function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // Return whatever logic you have to determine the latest URL
+  // This is YOUR logic that determines which URL is latest
+  res.status(200).json({
+    latestDataUrl: "YOUR_DYNAMIC_URL_HERE" // Your code determines this
+  });
+}
+
