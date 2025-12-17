@@ -10,7 +10,8 @@ export default async function handler(req) {
   try {
     // 1. Ask the GitHub API for the latest commit on your *data* repository.
     const githubResponse = await fetch(
-      'https://api.github.com/repos/zantac/Football-Data/branches/main',
+      // THE HYPHEN IS REMOVED HERE TO MATCH YOUR REPOSITORY NAME
+      'https://api.github.com/repos/zantac/FootballData/branches/main',
       {
         headers: {
           Authorization: `token ${process.env.GITHUB_TOKEN}`,
@@ -27,7 +28,8 @@ export default async function handler(req) {
     const latestCommitHash = branchInfo.commit.sha;
 
     // 2. Build the permanent jsDelivr URL for your specific data file.
-    const dataUrl = `https://cdn.jsdelivr.net/gh/zantac/Football-Data@${latestCommitHash}/Youth_Scores_data.json`;
+    // THE HYPHEN IS ALSO REMOVED HERE
+    const dataUrl = `https://cdn.jsdelivr.net/gh/zantac/FootballData@${latestCommitHash}/Youth_Scores_data.json`;
 
     // 3. Create the JSON response that your app will receive.
     const responsePayload = {
