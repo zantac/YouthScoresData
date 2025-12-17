@@ -9,7 +9,15 @@ export const config = {
 export default async function handler(req) {
   try {
     // 1. Ask the GitHub API for the latest commit on your *data* repository.
-    const githubResponse = await fetch('https://api.github.com/repos/zantac/FootballData/branches/main');
+    // NOTE: I am putting back the correct repository name and the GITHUB_TOKEN for reliability.
+    const githubResponse = await fetch(
+      'https://api.github.com/repos/zantac/Football-Data/branches/main',
+      {
+        headers: {
+          Authorization: `token ${process.env.GITHUB_TOKEN}`,
+        },
+      }
+    );
     
     if (!githubResponse.ok) {
       // If GitHub is down or the repo is private, throw an error.
@@ -19,9 +27,8 @@ export default async function handler(req) {
     const branchInfo = await githubResponse.json();
     const latestCommitHash = branchInfo.commit.sha;
 
-    // 2. Build the permanent jsDelivr URL pointing to the data file for that specific commit.
-    // THIS IS THE LINE THAT WAS CHANGED
-    const dataUrl = `https://cdn.jsdelivr.net/gh/zantac/FootballData@${latestCommitHash}/Youth_Scores_data.json`;
+    // 2. Build the permanent jsDelivr URL for your specific data file.
+    const dataUrl = `https://cdn.jsdelivr.net/gh/zantac/Football-Data@${latestCommitHash}/Youth_Scores_data.json`;
 
     // 3. Create the JSON response that your app will receive.
     const responsePayload = {
@@ -29,37 +36,29 @@ export default async function handler(req) {
     };
     
     // 4. Return the response.
-    // The 'Cache-Control' header is the magic part:
-    // It tells Vercel's CDN to cache this response for 5 minutes (300 seconds).
-    // This is fast enough for updates, and protects you from hitting API limits.
     return new Response(JSON.stringify(responsePayload), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 's-maxage=300, stale-while-revalidate=600',
+        
+        // THIS IS WHERE YOU ADD THE CORS HEADERS
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
       },
     });
 
   } catch (error) {
-    // If anything goes wrong, return an error message.
+    // If anything goes wrong, return an error message with CORS headers too.
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
     });
   }
 }
-
-
-export default function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  // Return whatever logic you have to determine the latest URL
-  // This is YOUR logic that determines which URL is latest
-  res.status(200).json({
-    latestDataUrl: "YOUR_DYNAMIC_URL_HERE" // Your code determines this
-  });
-}
-
